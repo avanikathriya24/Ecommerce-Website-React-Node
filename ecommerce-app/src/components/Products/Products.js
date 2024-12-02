@@ -6,7 +6,7 @@ import { useCart } from './CartContex';
 import './Product.css';
 
 const fetchProducts = async () => {
-  const response = await fetch('http://localhost:5000/api/products'); 
+  const response = await fetch('http://localhost:5000/api/products');
   if (!response.ok) {
     throw new Error('Failed to fetch data');
   }
@@ -18,7 +18,7 @@ const ProductCard = ({ product, onAddToCart }) => {
     onAddToCart(product);
   };
 
-  let imageSrc = product.image || 'default-placeholder.jpg';  
+  let imageSrc = product.image || 'default-placeholder.jpg';
 
   return (
     <div className="product-card">
@@ -50,8 +50,8 @@ const ProductPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState('');
-  const [showForm, setShowForm] = useState(false); 
-  const [newProductStatus, setNewProductStatus] = useState(null); 
+  const [showForm, setShowForm] = useState(false);
+  const [newProductStatus, setNewProductStatus] = useState(null);
   const [formData, setFormData] = useState({
     title: '',
     price: '',
@@ -59,15 +59,18 @@ const ProductPage = () => {
     category: '',
     image: null,
   });
-  
   const [showAddToCartNotification, setShowAddToCartNotification] = useState(false);
+  
+  // Pagination States
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 16; // Set 16 items per page
 
   useEffect(() => {
     const getProducts = async () => {
       try {
         const data = await fetchProducts();
         setProducts(data);
-        setFilteredProducts(data); 
+        setFilteredProducts(data);
         setLoading(false);
       } catch (err) {
         setError('Error fetching data');
@@ -87,45 +90,43 @@ const ProductPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
     const price = parseFloat(formData.price);
-  
+
     if (isNaN(price)) {
       alert('Please enter a valid price');
       return;
     }
-  
-    const productRate = 0; 
-  
+
+    const productRate = 0;
+
     const newFormData = new FormData();
     newFormData.append('title', formData.title);
-    newFormData.append('price', price); 
+    newFormData.append('price', price);
     newFormData.append('description', formData.description);
     newFormData.append('category', formData.category);
-    newFormData.append('rate', productRate);  
-  
+    newFormData.append('rate', productRate);
+
     if (formData.image) {
       newFormData.append('image', formData.image);
     }
-  
+
     try {
       const response = await fetch('http://localhost:5000/api/products', {
         method: 'POST',
-        body: newFormData, 
+        body: newFormData,
       });
-  
+
       if (!response.ok) {
         throw new Error('Failed to add product');
       }
-  
+
       const addedProduct = await response.json();
       setNewProductStatus(`Product added successfully: ${addedProduct.title} (ID: ${addedProduct.id})`);
-  
-        // Refresh product list after adding the new product
-      const data = await fetchProducts();
-      setProducts(data);
-      setFilteredProducts(data); 
-    
+
+      setProducts((prevProducts) => [...prevProducts, addedProduct]);
+      setFilteredProducts((prevFilteredProducts) => [...prevFilteredProducts, addedProduct]);
+
       setFormData({
         title: '',
         price: '',
@@ -133,25 +134,24 @@ const ProductPage = () => {
         category: '',
         image: null,
       });
-      setShowForm(false); 
+      setShowForm(false);
     } catch (error) {
       setNewProductStatus('Error adding product');
-      console.error(error); 
+      console.error(error);
     }
   };
 
   const handleAddToCart = (product) => {
-    addToCart(product); 
-    setShowAddToCartNotification(true); 
-    setTimeout(() => setShowAddToCartNotification(false), 2000); 
+    addToCart(product);
+    setShowAddToCartNotification(true);
+    setTimeout(() => setShowAddToCartNotification(false), 2000);
   };
-
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     setFormData((prev) => ({
       ...prev,
-      image: file, 
+      image: file,
     }));
   };
 
@@ -160,15 +160,33 @@ const ProductPage = () => {
     setSelectedCategory(category);
 
     if (category === '') {
-      setFilteredProducts(products); 
+      setFilteredProducts(products);
     } else {
       const filtered = products.filter((product) => product.category === category);
-      setFilteredProducts(filtered); 
+      setFilteredProducts(filtered);
     }
+    setCurrentPage(1); // Reset to first page when category changes
   };
 
   const getCartCount = () => {
-    return cart.reduce((count, product) => count + product.quantity, 0);  
+    return cart.reduce((count, product) => count + product.quantity, 0);
+  };
+
+  // Pagination Logic
+  const indexOfLastProduct = currentPage * itemsPerPage;
+  const indexOfFirstProduct = indexOfLastProduct - itemsPerPage;
+  const currentProducts = filteredProducts.slice(indexOfFirstProduct, indexOfLastProduct);
+
+  const handleNextPage = () => {
+    if (currentPage * itemsPerPage < filteredProducts.length) {
+      setCurrentPage(prevPage => prevPage + 1);
+    }
+  };
+
+  const handlePrevPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(prevPage => prevPage - 1);
+    }
   };
 
   if (loading) {
@@ -200,10 +218,9 @@ const ProductPage = () => {
               <FontAwesomeIcon icon={faShoppingCart} />
               <span>{getCartCount()}</span>
               {showAddToCartNotification && (
-              <div className="cart-notification">Product added to cart!</div>
-            )}
+                <div className="cart-notification">Product added to cart!</div>
+              )}
             </a>
-            
           </div>
         </div>
         <button onClick={() => setShowForm(true)} className="add-product-btn">
@@ -215,7 +232,7 @@ const ProductPage = () => {
       {showForm && (
         <div className="add-product-form">
           <h3>Add a New Product</h3>
-          <form className='f1' onSubmit={handleSubmit}>
+          <form className="f1" onSubmit={handleSubmit}>
             <label>
               Title:
               <input
@@ -269,9 +286,16 @@ const ProductPage = () => {
       <h1>Our Products</h1>
 
       <div className="product-grid">
-        {filteredProducts.map((product) => (
+        {currentProducts.map((product) => (
           <ProductCard key={product.id} product={product} onAddToCart={handleAddToCart} />
         ))}
+      </div>
+
+      {/* Pagination Controls */}
+      <div className="pagination">
+        <button onClick={handlePrevPage} disabled={currentPage === 1}>Previous</button>
+        <span>Page {currentPage}</span>
+        <button onClick={handleNextPage} disabled={indexOfLastProduct >= filteredProducts.length}>Next</button>
       </div>
     </div>
   );
