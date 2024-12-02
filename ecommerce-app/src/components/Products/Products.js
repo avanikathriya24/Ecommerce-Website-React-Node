@@ -5,9 +5,8 @@ import { faShoppingCart } from '@fortawesome/free-solid-svg-icons';
 import { useCart } from './CartContex';
 import './Product.css';
 
-// Fetch products from the new API (your backend)
 const fetchProducts = async () => {
-  const response = await fetch('http://localhost:5000/api/products'); // Update with your backend API URL
+  const response = await fetch('http://localhost:5000/api/products'); 
   if (!response.ok) {
     throw new Error('Failed to fetch data');
   }
@@ -19,11 +18,10 @@ const ProductCard = ({ product, onAddToCart }) => {
     onAddToCart(product);
   };
 
-  let imageSrc = product.image || 'default-placeholder.jpg';  // Fallback if image is null
+  let imageSrc = product.image || 'default-placeholder.jpg';  
 
   return (
     <div className="product-card">
-      {/* Show image from base64 or URL */}
       <img src={imageSrc} alt={product.title} />
       <div className="product-info">
         <h3 className="product-title">{product.title}</h3>
@@ -52,8 +50,8 @@ const ProductPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState('');
-  const [showForm, setShowForm] = useState(false); // To show/hide the add product form
-  const [newProductStatus, setNewProductStatus] = useState(null); // Status of the new product
+  const [showForm, setShowForm] = useState(false); 
+  const [newProductStatus, setNewProductStatus] = useState(null); 
   const [formData, setFormData] = useState({
     title: '',
     price: '',
@@ -62,7 +60,6 @@ const ProductPage = () => {
     image: null,
   });
   
-  // Notification state for product added
   const [showAddToCartNotification, setShowAddToCartNotification] = useState(false);
 
   useEffect(() => {
@@ -70,7 +67,7 @@ const ProductPage = () => {
       try {
         const data = await fetchProducts();
         setProducts(data);
-        setFilteredProducts(data); // Set all products initially
+        setFilteredProducts(data); 
         setLoading(false);
       } catch (err) {
         setError('Error fetching data');
@@ -80,7 +77,6 @@ const ProductPage = () => {
     getProducts();
   }, []);
 
-  // Handle form data changes
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -92,7 +88,6 @@ const ProductPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
   
-    // Ensure price is a valid number
     const price = parseFloat(formData.price);
   
     if (isNaN(price)) {
@@ -100,16 +95,15 @@ const ProductPage = () => {
       return;
     }
   
-    const productRate = 0; // Default rating value
+    const productRate = 0; 
   
     const newFormData = new FormData();
     newFormData.append('title', formData.title);
-    newFormData.append('price', price);  // Valid price value
+    newFormData.append('price', price); 
     newFormData.append('description', formData.description);
     newFormData.append('category', formData.category);
-    newFormData.append('rate', productRate);  // Append rate value (could be dynamically set)
+    newFormData.append('rate', productRate);  
   
-    // Append the image file if it's available
     if (formData.image) {
       newFormData.append('image', formData.image);
     }
@@ -117,7 +111,7 @@ const ProductPage = () => {
     try {
       const response = await fetch('http://localhost:5000/api/products', {
         method: 'POST',
-        body: newFormData, // Sending the form data including the image
+        body: newFormData, 
       });
   
       if (!response.ok) {
@@ -127,11 +121,11 @@ const ProductPage = () => {
       const addedProduct = await response.json();
       setNewProductStatus(`Product added successfully: ${addedProduct.title} (ID: ${addedProduct.id})`);
   
-      // Update the products and filteredProducts arrays to include the newly added product
-      setProducts((prevProducts) => [...prevProducts, addedProduct]);
-      setFilteredProducts((prevFilteredProducts) => [...prevFilteredProducts, addedProduct]);
-  
-      // Reset the form data
+        // Refresh product list after adding the new product
+      const data = await fetchProducts();
+      setProducts(data);
+      setFilteredProducts(data); 
+    
       setFormData({
         title: '',
         price: '',
@@ -139,18 +133,17 @@ const ProductPage = () => {
         category: '',
         image: null,
       });
-      setShowForm(false); // Close the form after submitting
+      setShowForm(false); 
     } catch (error) {
       setNewProductStatus('Error adding product');
-      console.error(error); // Log the error for debugging
+      console.error(error); 
     }
   };
 
-  // Handle Add to Cart
   const handleAddToCart = (product) => {
-    addToCart(product); // Call the context's addToCart method
-    setShowAddToCartNotification(true); // Show notification
-    setTimeout(() => setShowAddToCartNotification(false), 3000); // Hide after 3 seconds
+    addToCart(product); 
+    setShowAddToCartNotification(true); 
+    setTimeout(() => setShowAddToCartNotification(false), 2000); 
   };
 
 
@@ -158,25 +151,24 @@ const ProductPage = () => {
     const file = e.target.files[0];
     setFormData((prev) => ({
       ...prev,
-      image: file, // Store the actual file here for uploading
+      image: file, 
     }));
   };
 
-  // Filter products by category
   const handleCategoryChange = (event) => {
     const category = event.target.value;
     setSelectedCategory(category);
 
     if (category === '') {
-      setFilteredProducts(products); // Show all products
+      setFilteredProducts(products); 
     } else {
       const filtered = products.filter((product) => product.category === category);
-      setFilteredProducts(filtered); // Filter products
+      setFilteredProducts(filtered); 
     }
   };
 
   const getCartCount = () => {
-    return cart.reduce((count, product) => count + product.quantity, 0);  // Sum up the quantities
+    return cart.reduce((count, product) => count + product.quantity, 0);  
   };
 
   if (loading) {
@@ -207,14 +199,13 @@ const ProductPage = () => {
             <a href="/cart">
               <FontAwesomeIcon icon={faShoppingCart} />
               <span>{getCartCount()}</span>
+              {showAddToCartNotification && (
+              <div className="cart-notification">Product added to cart!</div>
+            )}
             </a>
             
           </div>
         </div>
-        {showAddToCartNotification && (
-              <div className="cart-notification">Product added to cart!</div>
-            )}
-
         <button onClick={() => setShowForm(true)} className="add-product-btn">
           Add New Product
         </button>

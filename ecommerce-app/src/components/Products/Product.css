@@ -140,6 +140,7 @@ background-color: #e68900;
   text-align: right;
   color: black;
   margin-right: 40px;
+  display: flex;
 }
 
 
@@ -312,7 +313,7 @@ flex-direction: column;
 
 
 .cart-notification {
-  animation: fadeInAnimation ease 3s;
+  animation: fadeOutAnimation ease 3s;
   animation-iteration-count: 1;
   animation-fill-mode: forwards;
   top: 10px;
@@ -323,7 +324,7 @@ flex-direction: column;
   font-size: 20px;
 }
 
-@keyframes fadeInAnimation {
+@keyframes fadeOutAnimation {
   0% {
       opacity: 1;
   }

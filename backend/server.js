@@ -3,20 +3,36 @@ const mysql = require('mysql2');
 const cors = require('cors');
 const multer = require('multer');
 const path = require('path');
+const fs = require('fs');
 
 // Initialize Express app
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// Middleware
 app.use(cors());
-app.use(express.json()); // For parsing application/json
+app.use(express.json()); 
 
-// Set up multer storage and file handling
-const storage = multer.memoryStorage(); // Store image in memory (you can save to disk if required)
+// Create 'images' directory if it doesn't exist
+const imageDir = path.join(__dirname, 'images');
+if (!fs.existsSync(imageDir)) {
+  fs.mkdirSync(imageDir);
+}
+
+// Set up multer to store images in 'images/' directory
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, imageDir); // Store images in 'images/' folder
+  },
+  filename: (req, file, cb) => {
+    // Use the original filename with a timestamp to avoid conflicts
+    const ext = path.extname(file.originalname); // Get file extension
+    cb(null, Date.now() + ext); // Save as a unique filename
+  }
+});
+
 const upload = multer({ storage: storage });
 
-// MySQL Connection
+// MySQL connection
 const db = mysql.createConnection({
   host: 'localhost',
   user: 'root',
@@ -32,45 +48,44 @@ db.connect((err) => {
   console.log('Connected to MySQL');
 });
 
-// API Routes
+// Serve images statically
+app.use('/images', express.static(imageDir));
 
-// Add new product
+// Add a new product with image
 app.post('/api/products', upload.single('image'), (req, res) => {
   const { title, price, description, category } = req.body;
-  const image = req.file ? req.file.buffer : null; // Get the uploaded image from req.file
+  const image = req.file ? `/images/${req.file.filename}` : null; // Store image path in DB
 
-  // Insert product details into MySQL database
+  // SQL query to insert the new product
   const query = 'INSERT INTO Product (title, price, description, category, image) VALUES (?, ?, ?, ?, ?)';
   db.query(query, [title, price, description, category, image], (err, result) => {
     if (err) {
       console.error('Database error:', err);
       return res.status(500).json({ error: 'Failed to add product' });
     }
-    res.json({ id: result.insertId, title, price, description, category, image: null });
+    res.json({
+      id: result.insertId,
+      title,
+      price,
+      description,
+      category,
+      image, // Send back the image URL
+    });
   });
 });
 
-// Get all products (with images)
+// Get all products (with image URLs)
 app.get('/api/products', (req, res) => {
   db.query('SELECT * FROM Product', (err, results) => {
     if (err) {
       console.error('Database error:', err);
       return res.status(500).json({ error: 'Failed to fetch products' });
     }
-    const productsWithImages = results.map((product) => {
-      const base64Image = product.image
-        ? `data:image/jpeg;base64,${Buffer.from(product.image).toString('base64')}`
-        : null;
-      return {
-        ...product,
-        image: base64Image,
-      };
-    });
-    res.json(productsWithImages);
+    res.json(results); // The image field will contain the URL (e.g., /images/sample.jpg)
   });
 });
 
-// Server Listen
+// Start server
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });
