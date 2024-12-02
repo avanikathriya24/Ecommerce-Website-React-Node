@@ -1,0 +1,118 @@
+ /* body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  } */
+  
+  .todo {
+    background-color: white;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    font-family: Arial, sans-serif;
+    margin: 50px;
+    justify-content: center;
+    align-items: center;
+  } 
+  
+
+
+  h1 {
+    text-align: center;
+    color: #333;
+  }
+  
+  .task-input {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+  }
+  
+  .task-input input {
+    width: 70%;
+    padding: 8px;
+    font-size: 16px;
+    border-radius: 4px;
+  }
+  
+  .task-input button {
+    padding: 8px 16px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .task-list {
+    list-style-type: none;
+    padding: 0;
+  }
+  
+  .task-list li {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+    align-items: center;
+  }
+  
+  .task-list li.completed span {
+    color: Green;
+  }
+  
+  .task-list li button {
+    background-color: red;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .task-list li button:hover {
+    background-color:red;
+  }
+  
+  .task-filters button {
+    padding: 8px 16px;
+    margin-right: 8px;
+    cursor: pointer;
+    background-color: #ddd;
+    border: none;
+    border-radius: 4px;
+  }
+  
+  .task-filters button:hover {
+    background-color: #bbb;
+  }
+  
+  .task-filters button.active {
+    background-color: #4CAF50;
+    color: white;
+  }
+  
+  .task-filters button:active {
+    background-color: #45a049;
+  }
+  
+  
+  .error-message {
+    color: red;
+    font-weight: bold;
+    margin-top: 10px;
+    text-align: center;
+  }
+
+  .nothing-to-preview {
+    font-size: 18px;
+    color: #888;
+    text-align: center;
+    margin-top: 20px;
+  }
+  
+
+  

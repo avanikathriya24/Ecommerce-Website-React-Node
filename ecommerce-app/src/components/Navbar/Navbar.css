@@ -1,0 +1,92 @@
+/* Base styles for desktop */
+.navbar {
+  background-color: #424242;
+  color: #333;
+  /* margin-left: 100px; */
+  /* margin-right: 100px; */
+}
+
+.navbar-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.nav-menu {
+  display: flex;
+  list-style: none;
+}
+
+.nav-item {
+  margin-left: 25px;
+  margin-right: 25px;
+}
+
+.nav-link {
+  color: #c7c7c7;
+  text-decoration: none;
+  font-size: 18px;
+  font-family: 'Kumbh Sans', sans-serif;
+  font-weight: 500;
+}
+
+.nav-link:hover {
+  color: rgb(148, 74, 74);
+}
+
+/* Mobile styles */
+@media (max-width: 768px) {
+  .navbar-container {
+    justify-content: space-between;
+    padding: 10px;
+  }
+
+  /* Hide nav items off-screen initially */
+  .nav-menu {
+    display: none;
+    position: fixed;
+    top: 0;
+    right: -100%; /* Start off-screen */
+    width: 140px;
+    height: 100%;
+    background-color: #fff;
+    flex-direction: column;
+    padding-top: 60px; /* Adjust to position links nicely */
+    box-shadow: -4px 0 8px rgba(0, 0, 0, 0.1);
+    transition: right 0.3s ease-in-out; /* Slide effect */
+    z-index: 100;
+  }
+
+  .nav-item {
+    margin: 20px 0;
+    text-align: center;
+  }
+
+  .navbar-logo {
+    max-width: 120px;
+  }
+
+  /* Show the toggle button on mobile */
+  .nav-toggle {
+    display: block;
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    font-size: 30px;
+    color: #333;
+    z-index: 200;
+  }
+
+  /* When active, slide the menu in from the right */
+  .nav-menu.active {
+    right: 0; /* Bring menu into view */
+    display: flex; /* Ensure it displays as flex when active */
+  }
+}
+
+/* Desktop styles - nav toggle button is hidden */
+@media (min-width: 769px) {
+  .nav-toggle {
+    display: none; /* Hide toggle button on larger screens */
+  }
+}

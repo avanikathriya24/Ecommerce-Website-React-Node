@@ -1,0 +1,55 @@
+/* General reset for consistency */
+
+  
+  .search-container {
+    display: flex;
+    justify-content: center;
+    margin: 20px 0;
+  }
+  
+  /* Styling for the form */
+  .f2 {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  /* Styling for the input field */
+  .search-input {
+    padding: 12px;
+    font-size: 1rem;
+    width: 250px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin-right: 10px;
+    transition: border 0.3s ease;
+  }
+  
+  .search-input:focus {
+    border-color: #0077b6;
+    outline: none;
+  }
+  
+  /* Styling for the submit button */
+  .search-button {
+    padding: 12px 18px;
+    background-color: #0077b6;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .search-button:hover {
+    background-color: #005f8b;
+  }
+  
+  /* Responsive styling */
+  @media (max-width: 600px) {
+    .search-input {
+      width: 70%;
+    }
+  }
+  
