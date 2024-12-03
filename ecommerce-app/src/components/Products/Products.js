@@ -18,11 +18,12 @@ const ProductCard = ({ product, onAddToCart }) => {
     onAddToCart(product);
   };
 
-  let imageSrc = product.image || 'default-placeholder.jpg';
+  // If there's no image, use a placeholder
+  const imageSrc = product.image || 'default-placeholder.jpg';
 
   return (
     <div className="product-card">
-      <img src={imageSrc} alt={product.title} />
+      <img src={`http://localhost:5000${imageSrc}`} alt={product.title} />
       <div className="product-info">
         <h3 className="product-title">{product.title}</h3>
         <div className="product-rating">
@@ -63,7 +64,7 @@ const ProductPage = () => {
   
   // Pagination States
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 16; // Set 16 items per page
+  const itemsPerPage = 15; // Set 16 items per page
 
   useEffect(() => {
     const getProducts = async () => {
