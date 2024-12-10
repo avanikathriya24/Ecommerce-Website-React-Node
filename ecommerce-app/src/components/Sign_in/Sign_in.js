@@ -1,87 +1,86 @@
-import React, { useState } from "react";
-import { useNavigate } from 'react-router-dom';
-import "./Sign_in.css";
-import axios from "axios"
+import React, { useState } from 'react';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom'; 
+import './Sign_in.css'; 
 
-function Sign_in() {
-  const [user, setUserDetails] = useState({
-    email: "",
-    password: "",
+const Sign_in = ({ setAuthToken }) => {
+  const [formData, setFormData] = useState({
+    email: '',
+    password: '',
   });
+  const [error, setError] = useState('');
+  const navigate = useNavigate(); 
 
-  const [formErrors, setFormErrors] = useState({});
-  const navigate = useNavigate();
-
-  const changeHandler = (e) => {
+  const handleChange = (e) => {
     const { name, value } = e.target;
-    setUserDetails({ ...user, [name]: value });
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
-
-  const loginHandler = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-
+    setError('');
+  
+    const { email, password } = formData;
+  
     try {
-      const res = await axios.post("http://localhost:5000/sign_in/", user);
-      const data = res.data;
-
-      if (data.success) {
-        const userId = data.user_id;
-        const userRole = data.role; // Get role from the response
-
-        const expiryDate = new Date();
-        expiryDate.setDate(expiryDate.getDate() + 30);
-
-        document.cookie = `userId=${userId}; expires=${expiryDate.toUTCString()}; path=/; secure; SameSite=Lax`;
-
-        // Redirect based on user role
-        if (userRole === "admin") {
-          navigate("/admin-dashboard");
-        } else {
-          navigate("/dashboard");
-        }
-      } else {
-        setFormErrors(data);
+      const response = await axios.post('http://localhost:5000/api/auth/signin', {
+        username: email,
+        password: password,
+      });
+  
+      if (response.data.token) {
+        setAuthToken(response.data.token); // Set the JWT token
+        localStorage.setItem('token', response.data.token); // Store token in localStorage
+        alert('Login successful');
+        navigate('/products'); // Redirect to products page
       }
     } catch (error) {
-      console.error("Login failed", error);
+      console.error('Error response:', error); // Log the full error to inspect it
+  
+      if (error.response) {
+        // If error response exists, display the message
+        setError(error.response.data.message || 'Something went wrong');
+      } else if (error.request) {
+        // If no response, check if the request was made
+        setError('No response from server');
+      } else {
+        // If neither response nor request exist, log the general error
+        setError(error.message || 'An unexpected error occurred');
+      }
     }
   };
+   
 
   return (
-    <div className="sign-in">
-      <div className="login">
-        <form>
-          <h1>Login</h1>
+    <div className="sign-in-container">
+      <h2 className="sign-in-heading">Sign In</h2>
+      {error && <p className="error-message">{error}</p>}
+      <form className="sign-in-form" onSubmit={handleSubmit}>
+        <div className="form-group">
+          <label className="form-label">Email</label>
           <input
+            className="form-input"
             type="email"
             name="email"
-            id="email"
-            placeholder="Email"
-            onChange={changeHandler}
-            value={user.email}
+            value={formData.email}
+            onChange={handleChange}
+            required
           />
-          <p className="error">{formErrors.email}</p>
+        </div>
+        <div className="form-group">
+          <label className="form-label">Password</label>
           <input
+            className="form-input"
             type="password"
             name="password"
-            id="password"
-            placeholder="Password"
-            onChange={changeHandler}
-            value={user.password}
+            value={formData.password}
+            onChange={handleChange}
+            required
           />
-          <p className="error">{formErrors.notMatch}</p>
-          <button
-            type="submit"
-            className="button_common"
-            onClick={loginHandler}
-          >
-            Sign in
-          </button>
-        </form>
-        <a href="/sign_up">Not yet registered? Sign up Now</a>
-      </div>
+        </div>
+        <button type="submit" className="submit-btn">Sign In</button>
+      </form>
     </div>
   );
-}
+};
 
 export default Sign_in;

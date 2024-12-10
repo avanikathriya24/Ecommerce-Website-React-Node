@@ -1,39 +1,50 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import './Navbar.css'; // Import your CSS file
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom'; 
+import './Navbar.css'; 
 
-function Navbar() {
-  const [menuActive, setMenuActive] = useState(false);
+function Navbar({ loggedIn, handleLogout }) {
+  const [menuOpen, setMenuOpen] = useState(false);
 
-  // Toggle menu visibility
-  const toggleMenu = () => {
-    setMenuActive(!menuActive);
+  const toggleProfileMenu = () => {
+    setMenuOpen((prevState) => !prevState);
   };
 
   return (
     <nav className="navbar">
       <div className="navbar-container">
-        {/* Navbar Links */}
-        <ul className={`nav-menu ${menuActive ? 'active' : ''}`}>
+        <ul className="nav-menu">
           <li className="nav-item">
-            <Link to="/" className="nav-link">TODO LIST</Link>
-          </li>
-          <li className="nav-item">
-            <Link to="/weather" className="nav-link">WEATHER</Link>
+            <Link to="/" className="nav-link">TODO</Link>
           </li>
           <li className="nav-item">
             <Link to="/products" className="nav-link">PRODUCTS</Link>
           </li>
-          
-   
+          <li className="nav-item">
+            <Link to="/weather" className="nav-link">WEATHER</Link>
+          </li>
         </ul>
 
-          <button className="nav-toggle" onClick={toggleMenu}>
-          &#9776; {/* Hamburger icon */}
+        <div className="nav-links">
+          {!loggedIn ? (
+            <>
+              <Link to="/sign_in" className="nav-link">Sign In</Link>
+              <Link to="/sign_up" className="nav-link">Sign Up</Link>
+            </>
+          ) : (
+            <div className="profile-menu">
+              <Link to="/profile" className="nav-link">My Profile</Link>
+              <button onClick={handleLogout} className="nav-link nav-button">Sign Out</button>
+            </div>
+          )}
+        </div>
+
+        <button className="nav-toggle" onClick={() => setMenuOpen(!menuOpen)}>
+          &#9776;
         </button>
       </div>
     </nav>
   );
 }
+
 
 export default Navbar;

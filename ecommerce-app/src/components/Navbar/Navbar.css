@@ -28,6 +28,13 @@
   font-size: 18px;
   font-family: 'Kumbh Sans', sans-serif;
   font-weight: 500;
+  margin: 0px 20px;
+}
+
+.nav-button{
+  background-color: #424242;
+  box-shadow: none;
+  border-radius: 20%;
 }
 
 .nav-link:hover {
