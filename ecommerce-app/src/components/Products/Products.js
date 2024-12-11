@@ -18,7 +18,6 @@ const ProductCard = ({ product, onAddToCart }) => {
     onAddToCart(product);
   };
 
-  // If there's no image, use a placeholder
   const imageSrc = product.image || 'default-placeholder.jpg';
 
   return (
@@ -59,12 +58,12 @@ const ProductPage = () => {
     description: '',
     category: '',
     image: null,
+    count: 0,
   });
   const [showAddToCartNotification, setShowAddToCartNotification] = useState(false);
   
-  // Pagination States
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 15; // Set 16 items per page
+  const itemsPerPage = 15; 
 
   useEffect(() => {
     const getProducts = async () => {
@@ -88,59 +87,73 @@ const ProductPage = () => {
       [name]: value,
     }));
   };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     const price = parseFloat(formData.price);
-
+  
     if (isNaN(price)) {
       alert('Please enter a valid price');
       return;
     }
-
+  
     const productRate = 0;
-
+    const productCount = 0;  // Default count to 0
+  
     const newFormData = new FormData();
     newFormData.append('title', formData.title);
     newFormData.append('price', price);
     newFormData.append('description', formData.description);
     newFormData.append('category', formData.category);
-    newFormData.append('rate', productRate);
-
+    newFormData.append('rate', productRate);  
+    newFormData.append('count', productCount);  
+  
     if (formData.image) {
       newFormData.append('image', formData.image);
     }
-
+  
+    // Get the token from localStorage
+    const token = localStorage.getItem('token');
+    console.log(token)
+  
     try {
       const response = await fetch('http://localhost:5000/api/products', {
         method: 'POST',
         body: newFormData,
+        headers: {
+          'Authorization': token ? `Bearer ${token}` : '', // Include the token in the header
+        },
       });
-
+  
       if (!response.ok) {
-        throw new Error('Failed to add product');
+        const errorData = await response.json();
+        throw new Error(`Failed to add product: ${errorData.error || 'Unknown error'}`);
       }
-
+  
       const addedProduct = await response.json();
       setNewProductStatus(`Product added successfully: ${addedProduct.title} (ID: ${addedProduct.id})`);
-
       setProducts((prevProducts) => [...prevProducts, addedProduct]);
       setFilteredProducts((prevFilteredProducts) => [...prevFilteredProducts, addedProduct]);
-
+  
       setFormData({
         title: '',
         price: '',
         description: '',
         category: '',
+        rate: 0,  
+        count: productCount,  
         image: null,
       });
       setShowForm(false);
+  
     } catch (error) {
-      setNewProductStatus('Error adding product');
-      console.error(error);
+      setNewProductStatus(`Error adding product: ${error.message}`);
+      console.error(`Error adding product: ${token}`, error);
     }
   };
+  
+  
+  
 
   const handleAddToCart = (product) => {
     addToCart(product);
@@ -166,14 +179,13 @@ const ProductPage = () => {
       const filtered = products.filter((product) => product.category === category);
       setFilteredProducts(filtered);
     }
-    setCurrentPage(1); // Reset to first page when category changes
+    setCurrentPage(1); 
   };
 
   const getCartCount = () => {
     return cart.reduce((count, product) => count + product.quantity, 0);
   };
 
-  // Pagination Logic
   const indexOfLastProduct = currentPage * itemsPerPage;
   const indexOfFirstProduct = indexOfLastProduct - itemsPerPage;
   const currentProducts = filteredProducts.slice(indexOfFirstProduct, indexOfLastProduct);
@@ -278,6 +290,15 @@ const ProductPage = () => {
               <input type="file" accept="image/*" onChange={handleImageChange} />
               {formData.image && <img src={URL.createObjectURL(formData.image)} alt="Product Preview" width="100" />}
             </label>
+            <label>
+              Count:
+              <input
+                type="number"
+                name="count"
+                value={formData.count}
+                onChange={handleInputChange}
+              />
+            </label>
             <button type="submit">Add Product</button>
             <button type="button" onClick={() => setShowForm(false)}>Cancel</button>
           </form>
@@ -292,7 +313,6 @@ const ProductPage = () => {
         ))}
       </div>
 
-      {/* Pagination Controls */}
       <div className="pagination">
         <button onClick={handlePrevPage} disabled={currentPage === 1}>Previous</button>
         <span>Page {currentPage}</span>

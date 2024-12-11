@@ -28,22 +28,22 @@ const Sign_in = ({ setAuthToken }) => {
       });
   
       if (response.data.token) {
-        setAuthToken(response.data.token); // Set the JWT token
-        localStorage.setItem('token', response.data.token); // Store token in localStorage
+        setAuthToken(response.data.token); 
+        localStorage.setItem('token', response.data.token); 
+        console.log(localStorage.getItem('token'))
+
+
         alert('Login successful');
-        navigate('/products'); // Redirect to products page
+        navigate('/products'); 
       }
     } catch (error) {
-      console.error('Error response:', error); // Log the full error to inspect it
+      console.error('Error response:', error); 
   
       if (error.response) {
-        // If error response exists, display the message
         setError(error.response.data.message || 'Something went wrong');
       } else if (error.request) {
-        // If no response, check if the request was made
         setError('No response from server');
       } else {
-        // If neither response nor request exist, log the general error
         setError(error.message || 'An unexpected error occurred');
       }
     }

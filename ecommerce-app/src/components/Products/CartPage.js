@@ -1,19 +1,20 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+
 import { useCart } from './CartContex';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrash } from '@fortawesome/free-solid-svg-icons';
 import './CartPage.css';
 
+
 const CartPage = () => {
   const { cart, removeFromCart, removeAllFromCart, updateQuantity } = useCart();
 
-  // Calculate subtotal by summing the price * quantity for each item
   const calculateSubtotal = () => {
     return cart.reduce((subtotal, product) => subtotal + product.price * product.quantity, 0).toFixed(2);
   };
 
   const handleRemove = (productId) => {
-    removeFromCart(productId);  // Removes product from cart
+    removeFromCart(productId);  
   };
 
   const handleRemoveAll = () => {
@@ -29,7 +30,7 @@ const CartPage = () => {
     <div className="cart-page">
       <h1>Your Cart</h1>
       {cart.length === 0 ? (
-        <p>Your cart is empty</p>  // Shows empty message if cart is empty
+        <p>Your cart is empty</p> 
       ) : (
         <>
           <button onClick={handleRemoveAll} className="remove-all-btn">
@@ -42,14 +43,14 @@ const CartPage = () => {
                 <div className="cart-item-info">
                   <h3>{product.title}</h3>
                   <p>${product.price}</p>
-                  {/* Quantity dropdown */}
+                  Quantity dropdown
                   <select 
                     value={product.quantity} 
                     onChange={(e) => handleQuantityChange(product.id, e)}
                     className="quantity-select"
                   >
                     {[...Array(10).keys()].map(i => (
-                      <option key={i+1} value={i+1}>{i+1}</option> // Create options from 1 to 10
+                      <option key={i+1} value={i+1}>{i+1}</option> 
                     ))}
                   </select>
                   <p>Total: ${product.price * product.quantity}</p>
@@ -61,7 +62,7 @@ const CartPage = () => {
             ))}
           </div>
           <div className="cart-subtotal">
-            <h3>Subtotal: ${calculateSubtotal()}</h3> {/* Display subtotal */}
+            <h3>Subtotal: ${calculateSubtotal()}</h3>
           </div>
         </>
       )}

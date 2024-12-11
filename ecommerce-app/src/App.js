@@ -8,8 +8,6 @@ import { CartProvider } from './components/Products/CartContex';
 import Sign_in from './components/Sign_in/Sign_in';
 import Sign_up from './components/Sign_up/Sign_up';
 
-
-
 import { BrowserRouter,Route, Routes } from 'react-router-dom';
 
 function App() {
@@ -19,15 +17,13 @@ function App() {
   const handleSetAuthToken = (token) => {
     setAuthToken(token);
     localStorage.setItem('token', token);
-    setLoggedIn(true); // Update loggedIn state on successful login
+    setLoggedIn(true); 
   };
-
   const handleLogout = () => {
     setAuthToken(null);
     localStorage.removeItem('token');
-    setLoggedIn(false); // Update loggedIn state on logout
+    setLoggedIn(false); 
   };
-
   return (
     <div className="App">
       <BrowserRouter>
