@@ -6,6 +6,7 @@ import { useCart } from './CartContex';
 import './Product.css';
 import { addToCart } from '../Products/cartServices';
 
+
 const fetchProducts = async () => {
   const response = await fetch('http://localhost:5000/api/products');
   if (!response.ok) {
@@ -55,6 +56,8 @@ const ProductPage = () => {
   const [selectedCategory, setSelectedCategory] = useState('');
   const [showForm, setShowForm] = useState(false);
   const [newProductStatus, setNewProductStatus] = useState(null);
+  const [isUserLoggedIn, setIsUserLoggedIn] = useState(false); // Added state for user login status
+
   const [formData, setFormData] = useState({
     title: '',
     price: '',
@@ -64,11 +67,15 @@ const ProductPage = () => {
     count: 0,
   });
   const [showAddToCartNotification, setShowAddToCartNotification] = useState(false);
-  
+
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 15; 
 
+  
+
   useEffect(() => {
+    const token = localStorage.getItem('token');
+    setIsUserLoggedIn(!!token); 
     const getProducts = async () => {
       try {
         const data = await fetchProducts();
@@ -82,6 +89,8 @@ const ProductPage = () => {
     };
     getProducts();
   }, []);
+
+  
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -116,7 +125,7 @@ const ProductPage = () => {
     }
   
     // Get the token from localStorage
-    const token = localStorage.getItem('authToken');
+    const token = localStorage.getItem('token');
     console.log(token)
   
     try {
@@ -239,9 +248,14 @@ const ProductPage = () => {
             </a>
           </div>
         </div>
-        <button onClick={() => setShowForm(true)} className="add-product-btn">
-          Add New Product
-        </button>
+       
+        {isUserLoggedIn && (
+          <button onClick={() => setShowForm(true)} className="add-product-btn">
+            Add New Product
+          </button>
+        )}
+
+        
         {newProductStatus && <p>{newProductStatus}</p>}
       </div>
 

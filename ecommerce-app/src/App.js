@@ -22,6 +22,9 @@ function App() {
   const handleLogout = () => {
     setAuthToken(null);
     localStorage.removeItem('token');
+    localStorage.removeItem('cart'); // Optional: Clear local storage cart
+    window.location.reload(); // Reload the page to reset the state
+
     setLoggedIn(false); 
   };
   return (

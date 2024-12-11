@@ -7,6 +7,7 @@ export const addToCart = async (productId, quantity = 1) => {
   const token = localStorage.getItem('token');
 
   if (token) {
+    // User is signed in, store cart data in the database
     try {
       const response = await fetch(`${API_BASE_URL}/cart`, {
         method: 'POST',
@@ -26,6 +27,7 @@ export const addToCart = async (productId, quantity = 1) => {
       console.error('Error adding to cart:', err);
     }
   } else {
+    // User is not signed in, store cart data in local storage
     addToCartLocal(productId, quantity);
     console.log('Product added to local cart');
   }
@@ -35,6 +37,7 @@ export const fetchCart = async () => {
   const token = localStorage.getItem('token');
 
   if (token) {
+    // User is signed in, fetch cart data from the database
     try {
       const response = await fetch(`${API_BASE_URL}/cart`, {
         headers: { Authorization: `Bearer ${token}` },
@@ -53,8 +56,10 @@ export const fetchCart = async () => {
       return [];
     }
   } else {
-    const cart = getCartLocal();
+    // User is not signed in, fetch cart data from local storage
+    const cart = getCartLocal(); // Fetch from local storage
     console.log('Guest Cart:', cart);
     return cart;
   }
 };
+
