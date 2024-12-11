@@ -7,8 +7,7 @@ const path = require('path');
 const bodyParser = require('body-parser');
 const authRoutes = require('./routes/authRoutes');
 const productRoutes = require('./routes/productRoutes');
-const cartRoutes = require('./routes/cartRoutes');  // Import cart routes
-
+const cartRoutes = require('./routes/cartRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -29,7 +28,7 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 app.use('/api/auth', authRoutes);   
 app.use('/api', productRoutes);  
-app.use('/api', cartRoutes);       
+app.use('/api', cartRoutes);
 
 
 

@@ -4,6 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faShoppingCart } from '@fortawesome/free-solid-svg-icons';
 import { useCart } from './CartContex';
 import './Product.css';
+import { addToCart } from '../Products/cartServices';
 
 const fetchProducts = async () => {
   const response = await fetch('http://localhost:5000/api/products');
@@ -16,6 +17,8 @@ const fetchProducts = async () => {
 const ProductCard = ({ product, onAddToCart }) => {
   const handleAddToCart = () => {
     onAddToCart(product);
+    addToCart(product.id, 1);
+
   };
 
   const imageSrc = product.image || 'default-placeholder.jpg';
@@ -113,7 +116,7 @@ const ProductPage = () => {
     }
   
     // Get the token from localStorage
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('authToken');
     console.log(token)
   
     try {
@@ -229,7 +232,7 @@ const ProductPage = () => {
           <div className="cart">
             <a href="/cart">
               <FontAwesomeIcon icon={faShoppingCart} />
-              <span>{getCartCount()}</span>
+              {/* <span>{getCartCount()}</span> */}
               {showAddToCartNotification && (
                 <div className="cart-notification">Product added to cart!</div>
               )}
